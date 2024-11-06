@@ -41,7 +41,7 @@ export const registerUser = async (req, res) => {
       await user.save();
       res
         .status(200)
-        .json({ message: "User Logged In Successfully", token: token });
+        .json({ message: "User Logged In Successfully", token: token, role:user.role });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

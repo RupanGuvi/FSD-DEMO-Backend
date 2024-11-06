@@ -2,9 +2,23 @@
 import Post from "../Models/postSchema.js";
 
 
+
 export const createPost = async (req, res) => {
   try {
-    const newPost = new Post({ ...req.body, user: req.user._id });
+    const { title, description } = req.body;
+    let imageUrl = "";
+    //if file uploaded then upload to cloudinary
+    if(req.file && req.file.path){
+      imageUrl= req.file.path;
+    }
+   
+    const newPost = new Post({
+      title,
+      description,
+      image: imageUrl,
+      user: req.user._id,
+    });
+
     await newPost.save();
     res
       .status(200)
@@ -66,6 +80,16 @@ export const deletePost = async (req, res) => {
 export const getPost = async (req, res) => {
   try {
     const posts = await Post.find({ approved: true }).populate("user", "name");
+    res.status(200).json({ message: "Posts Fetched Successfully", posts });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+// unapproved post 
+export const getUnapprovedPost = async (req, res) => {
+  try {
+    const posts = await Post.find({ approved: false }).populate("user", "name");
     res.status(200).json({ message: "Posts Fetched Successfully", posts });
   } catch (error) {
     res.status(500).json({ message: error.message });
